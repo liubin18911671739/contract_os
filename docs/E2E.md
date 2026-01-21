@@ -5,6 +5,7 @@
 ## 推荐工具
 
 ### Playwright（推荐）
+
 - 支持多浏览器（Chrome、Firefox、Safari、Edge）
 - 强大的选择器和 API
 - 自动等待机制
@@ -12,6 +13,7 @@
 - 并行测试执行
 
 ### 安装
+
 ```bash
 npm install -D @playwright/test
 npx playwright install
@@ -20,6 +22,7 @@ npx playwright install
 ## E2E 测试场景
 
 ### 场景 1：完整用户流程
+
 1. 启动应用
 2. 创建知识库集合
 3. 上传 KB 文档
@@ -29,6 +32,7 @@ npx playwright install
 7. 生成并下载报告
 
 ### 场景 2：知识库管理
+
 1. 创建多个 KB 集合
 2. 批量上传文档
 3. 验证索引完成
@@ -36,6 +40,7 @@ npx playwright install
 5. 验证快照过滤
 
 ### 场景 3：多任务并发
+
 1. 同时创建 3 个任务
 2. 验证队列处理
 3. 检查任务独立性
@@ -44,6 +49,7 @@ npx playwright install
 ## Playwright 配置示例
 
 ### playwright.config.ts
+
 ```typescript
 import { defineConfig, devices } from '@playwright/test';
 
@@ -79,6 +85,7 @@ export default defineConfig({
 ### E2E 测试示例
 
 #### e2e/complete-flow.spec.ts
+
 ```typescript
 import { test, expect } from '@playwright/test';
 
@@ -171,12 +178,14 @@ test.describe('Report Generation', () => {
 ## 运行 E2E 测试
 
 ### 安装依赖
+
 ```bash
 npm install -D @playwright/test
 npx playwright install
 ```
 
 ### 运行测试
+
 ```bash
 # 运行所有 E2E 测试
 npx playwright test
@@ -194,6 +203,7 @@ npx playwright test --reporter=html
 ## 测试数据准备
 
 ### e2e/fixtures/sample-contract.txt
+
 ```text
 服务合同
 
@@ -218,6 +228,7 @@ npx playwright test --reporter=html
 ```
 
 ### e2e/fixtures/sample-kb.txt
+
 ```text
 中华人民共和国合同法知识库
 
@@ -240,6 +251,7 @@ npx playwright test --reporter=html
 ## 持续集成配置
 
 ### GitHub Actions 示例
+
 ```yaml
 name: E2E Tests
 
@@ -288,6 +300,7 @@ jobs:
 ## 性能基准测试
 
 ### K6 性能测试示例
+
 ```javascript
 import http from 'k6/http';
 import { check, sleep } from 'k6';
@@ -316,10 +329,11 @@ export default function () {
   check(res.status === 201, 'Task creation failed');
 
   sleep(1);
-};
+}
 ```
 
 ### 运行 K6 测试
+
 ```bash
 # 安装 K6
 curl https://github.com/grafana/k6/releases/download/v0.47.0/k6-v0.47.0-linux-amd64.tar.gz -L | tar xvz
@@ -332,11 +346,13 @@ k6 run performance-test.js
 ## 测试最佳实践
 
 ### 1. 测试隔离
+
 - 每个测试使用独立数据
 - 测试前后清理数据
 - 使用事务回滚
 
 ### 2. 等待策略
+
 ```typescript
 // ❌ 不好的做法
 await page.waitForTimeout(5000);
@@ -344,10 +360,11 @@ await page.waitForTimeout(5000);
 // ✅ 好的做法
 await page.waitForSelector('.results-table');
 await page.waitForURL(/\/results\/.+/);
-await page.waitForResponse(response => response.status() === 200);
+await page.waitForResponse((response) => response.status() === 200);
 ```
 
 ### 3. 选择器策略
+
 ```typescript
 // 优先级：data-testid > aria-label > text
 await page.click('[data-testid="submit-button"]');
@@ -355,6 +372,7 @@ await page.click('button:has-text("Submit")');
 ```
 
 ### 4. 并行测试
+
 ```typescript
 test.describe.configure({ mode: 'parallel' })(() => {
   test('scenario 1', async () => {});

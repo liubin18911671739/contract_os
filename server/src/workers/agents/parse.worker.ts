@@ -35,7 +35,9 @@ class ParseAgent extends BaseAgent {
       parseResult = await fileParser.parse(file, task.mime, task.object_key);
     } catch (error) {
       logger.error({ taskId, mime: task.mime, error }, 'File parsing failed');
-      throw new Error(`Failed to parse file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to parse file: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
 
     const { text, metadata } = parseResult;
@@ -45,12 +47,15 @@ class ParseAgent extends BaseAgent {
       throw new Error('Parsed text is empty');
     }
 
-    logger.info({
-      taskId,
-      mime: task.mime,
-      textLength: text.length,
-      pages: metadata?.pages,
-    }, 'File parsed successfully');
+    logger.info(
+      {
+        taskId,
+        mime: task.mime,
+        textLength: text.length,
+        pages: metadata?.pages,
+      },
+      'File parsed successfully'
+    );
 
     // Store parsed text and metadata for next stage
     return {

@@ -5,6 +5,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import { sql } from '../config/db.js';
+import { randomUUID } from 'crypto';
 
 describe('KB Snapshot Filter', () => {
   it('should filter KB results by task snapshot version', async () => {
@@ -12,9 +13,40 @@ describe('KB Snapshot Filter', () => {
     // only chunks from the frozen version (as per task_kb_snapshots) are returned.
 
     // Setup: Create task with KB snapshot
-    const taskId = 'test_task_snap';
-    const collectionId = 'test_collection';
+    const taskId = `task_${randomUUID()}`;
+    const collectionId = `collection_${randomUUID()}`;
     const frozenVersion = 2;
+    const contractId = `contract_${randomUUID()}`;
+    const contractName = `Test Contract ${Date.now()}_${Math.random().toString(36).substring(7)}`;
+    const contractVersionId = `cv_${randomUUID()}`;
+    const configSnapshotId = `cfg_${randomUUID()}`;
+    const collectionName = `Test Collection ${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+    // Create parent records
+    await sql`
+      INSERT INTO contracts (id, contract_name, counterparty, contract_type)
+      VALUES (${contractId}, ${contractName}, 'Counterparty', 'SERVICE')
+    `;
+
+    await sql`
+      INSERT INTO contract_versions (id, contract_id, version_no, object_key, sha256, mime)
+      VALUES (${contractVersionId}, ${contractId}, 1, 'key', 'hash', 'text/plain')
+    `;
+
+    await sql`
+      INSERT INTO config_snapshots (id, ruleset_version, model_config_json, prompt_template_version, kb_collection_versions_json)
+      VALUES (${configSnapshotId}, 'v1.0', '{}', 'v1.0', '[]')
+    `;
+
+    await sql`
+      INSERT INTO precheck_tasks (id, contract_version_id, status, config_snapshot_id, kb_mode)
+      VALUES (${taskId}, ${contractVersionId}, 'QUEUED', ${configSnapshotId}, 'STRICT')
+    `;
+
+    await sql`
+      INSERT INTO kb_collections (id, name, scope, version, is_enabled)
+      VALUES (${collectionId}, ${collectionName}, 'GLOBAL', 1, true)
+    `;
 
     // Mock snapshot
     await sql`
@@ -63,5 +95,10 @@ describe('KB Snapshot Filter', () => {
     await sql`DELETE FROM task_kb_snapshots WHERE task_id = ${taskId}`;
     await sql`DELETE FROM kb_chunks WHERE id IN ('chunk1', 'chunk2', 'chunk3')`;
     await sql`DELETE FROM kb_documents WHERE id IN ('doc1', 'doc2', 'doc3')`;
+    await sql`DELETE FROM kb_collections WHERE id = ${collectionId}`;
+    await sql`DELETE FROM precheck_tasks WHERE id = ${taskId}`;
+    await sql`DELETE FROM config_snapshots WHERE id = ${configSnapshotId}`;
+    await sql`DELETE FROM contract_versions WHERE id = ${contractVersionId}`;
+    await sql`DELETE FROM contracts WHERE id = ${contractId}`;
   });
 });

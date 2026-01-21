@@ -24,7 +24,10 @@ export const ingestWorker = createWorker(
     }
 
     // Download file from MinIO
-    const stream = await minio.getObject(process.env.MINIO_BUCKET || 'contract-precheck', doc.object_key);
+    const stream = await minio.getObject(
+      process.env.MINIO_BUCKET || 'contract-precheck',
+      doc.object_key
+    );
     const chunks: Buffer[] = [];
 
     await new Promise((resolve, reject) => {
@@ -38,7 +41,8 @@ export const ingestWorker = createWorker(
     // Determine MIME type from doc_type
     let mime = 'text/plain';
     if (doc.doc_type === 'pdf') mime = 'application/pdf';
-    else if (doc.doc_type === 'docx') mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    else if (doc.doc_type === 'docx')
+      mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     else if (doc.doc_type === 'txt') mime = 'text/plain';
 
     // Parse file

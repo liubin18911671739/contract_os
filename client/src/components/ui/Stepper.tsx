@@ -13,10 +13,10 @@ export function Stepper({ steps }: StepperProps) {
                 step.status === 'completed'
                   ? 'bg-green-500 text-white'
                   : step.status === 'active'
-                  ? 'bg-blue-500 text-white'
-                  : step.status === 'error'
-                  ? 'bg-red-500 text-white'
-                  : 'bg-gray-200 text-gray-600'
+                    ? 'bg-blue-500 text-white'
+                    : step.status === 'error'
+                      ? 'bg-red-500 text-white'
+                      : 'bg-gray-200 text-gray-600'
               }`}
             >
               {step.status === 'completed' ? '✓' : index + 1}

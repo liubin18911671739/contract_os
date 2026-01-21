@@ -3,6 +3,7 @@
  */
 import { FastifyInstance } from 'fastify';
 import { reportService } from '../services/reportService.js';
+import { sql } from '../config/db.js';
 
 export async function reportRoutes(fastify: FastifyInstance) {
   // Download report
@@ -23,7 +24,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
   fastify.get('/reports/:reportId', async (request, reply) => {
     const { reportId } = request.params as { reportId: string };
 
-    const [report] = await request.server.sql`
+    const [report] = await sql`
       SELECT id, task_id, object_key, template_id, created_at
       FROM reports
       WHERE id = ${reportId}
@@ -41,7 +42,7 @@ export async function reportRoutes(fastify: FastifyInstance) {
   fastify.get('/precheck-tasks/:taskId/reports', async (request, reply) => {
     const { taskId } = request.params as { taskId: string };
 
-    const reports = await request.server.sql`
+    const reports = await sql`
       SELECT id, object_key, template_id, created_at
       FROM reports
       WHERE task_id = ${taskId}

@@ -14,7 +14,11 @@ export interface PaginationResult<T> {
   totalPages: number;
 }
 
-export function parsePagination(params: PaginationParams): { page: number; limit: number; offset: number } {
+export function parsePagination(params: PaginationParams): {
+  page: number;
+  limit: number;
+  offset: number;
+} {
   const page = Math.max(1, params.page || 1);
   const limit = Math.min(100, Math.max(1, params.limit || 20));
   const offset = (page - 1) * limit;

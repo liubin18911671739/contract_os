@@ -40,15 +40,18 @@ class ReportAgent extends BaseAgent {
       });
     }
 
-    logger.info({
-      taskId,
-      reports: results.length,
-      reportIds: results.map(r => r.reportId),
-    }, 'Report generation completed');
+    logger.info(
+      {
+        taskId,
+        reports: results.length,
+        reportIds: results.map((r) => r.reportId),
+      },
+      'Report generation completed'
+    );
 
     return {
       reports: results,
-      downloadUrls: results.map(r => ({
+      downloadUrls: results.map((r) => ({
         reportId: r.reportId,
         format: r.format,
         // URL would be generated on-demand via GET /api/reports/:reportId/download

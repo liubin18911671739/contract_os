@@ -131,7 +131,9 @@ export class KBService {
     collectionIds: string[],
     topK: number = 20,
     taskId?: string
-  ): Promise<Array<{ chunkId: string; text: string; score: number; docTitle: string; docVersion: number }>> {
+  ): Promise<
+    Array<{ chunkId: string; text: string; score: number; docTitle: string; docVersion: number }>
+  > {
     // Embed query
     const [queryEmbedding] = await modelGateway.embed([query]);
 

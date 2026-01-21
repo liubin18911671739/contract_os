@@ -4,7 +4,14 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Modal } from '../components/ui/Modal';
-import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '../components/ui/Table';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '../components/ui/Table';
 
 export default function KBAdmin() {
   const [collections, setCollections] = useState<any[]>([]);
@@ -83,7 +90,11 @@ export default function KBAdmin() {
         </TableBody>
       </Table>
 
-      <Modal isOpen={showNewCollection} onClose={() => setShowNewCollection(false)} title="Create Collection">
+      <Modal
+        isOpen={showNewCollection}
+        onClose={() => setShowNewCollection(false)}
+        title="Create Collection"
+      >
         <form onSubmit={handleCreateCollection} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>

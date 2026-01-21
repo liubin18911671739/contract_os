@@ -54,7 +54,10 @@ export class ContractService {
   }
 
   async downloadFile(objectKey: string): Promise<Buffer> {
-    const stream = await minio.getObject(process.env.MINIO_BUCKET || 'contract-precheck', objectKey);
+    const stream = await minio.getObject(
+      process.env.MINIO_BUCKET || 'contract-precheck',
+      objectKey
+    );
     const chunks: Buffer[] = [];
 
     return new Promise((resolve, reject) => {

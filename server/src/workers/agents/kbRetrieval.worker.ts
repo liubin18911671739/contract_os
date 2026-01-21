@@ -65,17 +65,23 @@ class KBRetrievalAgent extends BaseAgent {
 
         totalHits += results.length;
 
-        logger.debug({
-          taskId,
-          clauseId: clause.clause_id,
-          hits: results.length,
-        }, 'KB retrieval completed for clause');
+        logger.debug(
+          {
+            taskId,
+            clauseId: clause.clause_id,
+            hits: results.length,
+          },
+          'KB retrieval completed for clause'
+        );
       } catch (error) {
-        logger.error({
-          taskId,
-          clauseId: clause.clause_id,
-          error,
-        }, 'KB retrieval failed for clause');
+        logger.error(
+          {
+            taskId,
+            clauseId: clause.clause_id,
+            error,
+          },
+          'KB retrieval failed for clause'
+        );
 
         // Continue with other clauses even if one fails
         // Insert empty result to mark retrieval attempted
@@ -95,11 +101,14 @@ class KBRetrievalAgent extends BaseAgent {
       }
     }
 
-    logger.info({
-      taskId,
-      clauses: clauses.length,
-      totalHits,
-    }, 'KB retrieval completed for all clauses');
+    logger.info(
+      {
+        taskId,
+        clauses: clauses.length,
+        totalHits,
+      },
+      'KB retrieval completed for all clauses'
+    );
 
     return {
       clauses: clauses.length,

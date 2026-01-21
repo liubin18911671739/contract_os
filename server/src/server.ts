@@ -10,11 +10,7 @@ import { splitWorker } from './workers/agents/split.worker.js';
 import { llmRiskWorker } from './workers/agents/llmRisk.worker.js';
 import { kbRetrievalWorker } from './workers/agents/kbRetrieval.worker.js';
 import { reportWorker } from './workers/agents/report.worker.js';
-import {
-  rulesWorker,
-  evidenceWorker,
-  qcWorker,
-} from './workers/agents/stubWorkers.js';
+import { rulesWorker, evidenceWorker, qcWorker } from './workers/agents/stubWorkers.js';
 import { ingestWorker, indexWorker } from './workers/kb/kbWorkers.js';
 
 async function main() {

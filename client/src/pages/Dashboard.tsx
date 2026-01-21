@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '../components/ui/Table';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '../components/ui/Table';
 import { Badge } from '../components/ui/Badge';
 import { ProgressBar } from '../components/ui/Progress';
 
@@ -16,7 +23,13 @@ interface Task {
 export default function Dashboard() {
   const [tasks] = useState<Task[]>([
     // Demo tasks - in production, fetch from API
-    { id: 'demo1', status: 'DONE', progress: 100, current_stage: 'DONE', created_at: new Date().toISOString() },
+    {
+      id: 'demo1',
+      status: 'DONE',
+      progress: 100,
+      current_stage: 'DONE',
+      created_at: new Date().toISOString(),
+    },
   ]);
 
   return (

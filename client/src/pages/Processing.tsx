@@ -6,7 +6,17 @@ import { Stepper } from '../components/ui/Stepper';
 import { Timeline } from '../components/ui/Timeline';
 import { ProgressBar } from '../components/ui/Progress';
 
-const STAGES = ['QUEUED', 'PARSING', 'STRUCTURING', 'RULE_SCORING', 'KB_RETRIEVAL', 'LLM_RISK', 'EVIDENCING', 'QCING', 'DONE'];
+const STAGES = [
+  'QUEUED',
+  'PARSING',
+  'STRUCTURING',
+  'RULE_SCORING',
+  'KB_RETRIEVAL',
+  'LLM_RISK',
+  'EVIDENCING',
+  'QCING',
+  'DONE',
+];
 
 export default function Processing() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -24,7 +34,11 @@ export default function Processing() {
         setTask(taskData);
         setEvents(eventsData);
 
-        if (taskData.status === 'DONE' || taskData.status === 'FAILED' || taskData.status === 'CANCELLED') {
+        if (
+          taskData.status === 'DONE' ||
+          taskData.status === 'FAILED' ||
+          taskData.status === 'CANCELLED'
+        ) {
           setPolling(false);
           if (taskData.status === 'DONE') {
             setTimeout(() => navigate(`/results/${taskId}`), 1000);

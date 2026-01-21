@@ -21,17 +21,13 @@ describe('Queue Configuration', () => {
     ];
 
     assert.strictEqual(requiredQueues.length, 11);
-    assert.ok(requiredQueues.every(q => typeof q === 'string'));
+    assert.ok(requiredQueues.every((q) => typeof q === 'string'));
   });
 
   it('should validate queue naming convention', () => {
-    const queues = [
-      'precheck.orchestrator',
-      'precheck.agent.parse',
-      'kb.ingest',
-    ];
+    const queues = ['precheck.orchestrator', 'precheck.agent.parse', 'kb.ingest'];
 
-    queues.forEach(queue => {
+    queues.forEach((queue) => {
       const parts = queue.split('.');
       assert.ok(parts.length >= 2);
       assert.ok(['precheck', 'kb'].includes(parts[0]));

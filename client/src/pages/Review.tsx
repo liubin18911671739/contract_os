@@ -21,7 +21,7 @@ export default function Review() {
 
   async function load() {
     try {
-      const clausesData = await getTaskClauses(taskId!) as any[];
+      const clausesData = (await getTaskClauses(taskId!)) as any[];
       setClauses(clausesData);
       if (clausesData.length > 0) {
         setSelectedClause(clausesData[0]);
@@ -95,7 +95,9 @@ export default function Review() {
                       <div>
                         <div className="mb-4">
                           <h4 className="font-medium text-sm text-gray-500 mb-1">Risk Summary</h4>
-                          <p className="text-gray-900">{selectedClause.summary || 'No risk detected'}</p>
+                          <p className="text-gray-900">
+                            {selectedClause.summary || 'No risk detected'}
+                          </p>
                         </div>
                         <div>
                           <h4 className="font-medium text-sm text-gray-500 mb-1">Clause Text</h4>
@@ -111,7 +113,8 @@ export default function Review() {
                       <div>
                         <h4 className="font-medium text-sm text-gray-500 mb-2">Evidence</h4>
                         <Alert type="info">
-                          Evidence and KB citations would be displayed here in the full implementation.
+                          Evidence and KB citations would be displayed here in the full
+                          implementation.
                         </Alert>
                       </div>
                     )}
@@ -120,14 +123,24 @@ export default function Review() {
                       <div>
                         <h4 className="font-medium text-sm text-gray-500 mb-2">Review Actions</h4>
                         <div className="space-y-3">
-                          <Button size="sm" variant="secondary" onClick={() => handleConclusion('CONFIRM')}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleConclusion('CONFIRM')}
+                          >
                             Confirm Risk
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => handleConclusion('DISMISS')}>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleConclusion('DISMISS')}
+                          >
                             Dismiss Risk
                           </Button>
                           <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Notes
+                            </label>
                             <textarea
                               value={notes}
                               onChange={(e) => setNotes(e.target.value)}

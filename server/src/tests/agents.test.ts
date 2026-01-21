@@ -76,7 +76,7 @@ describe('Agent Stages', () => {
     ];
 
     assert.strictEqual(stages.length, 8);
-    assert.ok(stages.every(s => typeof s === 'string'));
+    assert.ok(stages.every((s) => typeof s === 'string'));
   });
 
   it('should validate stage ordering', () => {

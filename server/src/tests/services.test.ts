@@ -24,7 +24,19 @@ describe('TaskService', () => {
   });
 
   it('should validate task status transitions', () => {
-    const validStatuses = ['QUEUED', 'PARSING', 'STRUCTURING', 'RULE_SCORING', 'KB_RETRIEVAL', 'LLM_RISK', 'EVIDENCING', 'QCING', 'DONE', 'FAILED', 'CANCELLED'];
+    const validStatuses = [
+      'QUEUED',
+      'PARSING',
+      'STRUCTURING',
+      'RULE_SCORING',
+      'KB_RETRIEVAL',
+      'LLM_RISK',
+      'EVIDENCING',
+      'QCING',
+      'DONE',
+      'FAILED',
+      'CANCELLED',
+    ];
 
     // Verify all statuses are defined
     assert.ok(validStatuses.length > 0);

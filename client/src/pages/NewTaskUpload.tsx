@@ -73,7 +73,9 @@ export default function NewTaskUpload() {
 
   function toggleCollection(collectionId: string) {
     setSelectedCollections((prev) =>
-      prev.includes(collectionId) ? prev.filter((id) => id !== collectionId) : [...prev, collectionId]
+      prev.includes(collectionId)
+        ? prev.filter((id) => id !== collectionId)
+        : [...prev, collectionId]
     );
   }
 

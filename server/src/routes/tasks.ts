@@ -81,7 +81,9 @@ export async function taskRoutes(fastify: FastifyInstance) {
       GROUP BY pt.id
     `;
 
-    reply.send(summary || { clause_count: 0, high_risks: 0, medium_risks: 0, low_risks: 0, info_risks: 0 });
+    reply.send(
+      summary || { clause_count: 0, high_risks: 0, medium_risks: 0, low_risks: 0, info_risks: 0 }
+    );
   });
 
   // Get task clauses with risks

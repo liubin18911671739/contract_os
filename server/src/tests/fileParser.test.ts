@@ -21,25 +21,29 @@ describe('FileParser', () => {
 
     assert.ok(supported.includes('text/plain'));
     assert.ok(supported.includes('application/pdf'));
-    assert.ok(supported.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document'));
+    assert.ok(
+      supported.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    );
   });
 
   it('should check if MIME type is supported', () => {
     assert.strictEqual(fileParser.isSupported('text/plain'), true);
     assert.strictEqual(fileParser.isSupported('application/pdf'), true);
-    assert.strictEqual(fileParser.isSupported('application/vnd.openxmlformats-officedocument.wordprocessingml.document'), true);
+    assert.strictEqual(
+      fileParser.isSupported(
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ),
+      true
+    );
     assert.strictEqual(fileParser.isSupported('application/unsupported'), false);
   });
 
   it('should throw error for unsupported MIME type', async () => {
     const buffer = Buffer.from('test', 'utf-8');
 
-    await assert.rejects(
-      async () => {
-        await fileParser.parse(buffer, 'application/unsupported', 'test.bin');
-      },
-      /Unsupported MIME type/
-    );
+    await assert.rejects(async () => {
+      await fileParser.parse(buffer, 'application/unsupported', 'test.bin');
+    }, /Unsupported MIME type/);
   });
 
   it('should handle empty text file', async () => {

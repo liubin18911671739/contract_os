@@ -1,6 +1,6 @@
 # 合同预审系统（Contract Pre-check System）
 
-一个基于多智能体架构、知识库和本地大语言模型（vLLM）的智能合同预审查系统。
+一个基于多智能体架构、知识库和大语言模型（支持本地 vLLM 或智谱清言）的智能合同预审查系统。
 
 ## 系统架构
 
@@ -9,14 +9,20 @@
 - **数据库**：PostgreSQL + pgvector（向量检索）
 - **队列**：Redis（任务编排）
 - **存储**：MinIO（文件对象存储）
-- **大模型**：本地 vLLM
-  - Chat：Qwen2.5-7B-Instruct（端口 8000）
-  - Embed：BGE-M3（端口 8001）
-  - Rerank：BGE-Reranker-v2-m3（端口 8002）
+- **大模型**：
+  - **选项 1**：本地 vLLM（需要 GPU）
+    - Chat：Qwen2.5-7B-Instruct（端口 8000）
+    - Embed：BGE-M3（端口 8001）
+    - Rerank：BGE-Reranker-v2-m3（端口 8002）
+  - **选项 2**：智谱清言（云 API）
+    - Chat：GLM-4-Flash
+    - Embed：Embedding-3
+    - Rerank：Rerank-2
 
 ## 核心特性
 
 ### ✨ 多智能体协作
+
 系统通过 8 个智能体协作完成合同风险分析：
 
 1. **Parse Agent**：解析合同文件（TXT/PDF/DOCX）
@@ -29,17 +35,20 @@
 8. **Report Agent**：生成审阅报告
 
 ### 🎯 任务快照机制
+
 - 创建任务时冻结配置（规则集版本、模型配置、Prompt 版本）
 - 冻结 KB 集合版本，确保可回放
 - 所有状态变更写入 Timeline 审计日志
 
 ### 🔍 证据链追溯
+
 - 每条风险必须包含合同证据（条款引用）
 - KB 引用必须回链到具体 Chunk
 - QC Agent 自动校验引用有效性
 - 无效引用标注 `hallucination_suspect=true`
 
 ### 📊 向量检索 + 重排序
+
 - 向量相似度检索（Top-K=20）
 - Rerank 模型精排（Top-N=6）
 - 支持任务快照版本过滤
@@ -48,57 +57,62 @@
 
 ### 前置要求
 
+**本地 vLLM 模式**：
 - Node.js >= 18.0.0
 - Docker & Docker Compose
 - NVIDIA GPU（建议 RTX 4090 24GB）
 - nvidia-container-toolkit（GPU 容器支持）
 
+**智谱清言模式**：
+- Node.js >= 18.0.0
+- Docker & Docker Compose
+- 智谱清言 API Key
+
 ### 一键启动
 
-#### 1. 启动基础设施服务
+#### 方式 1：本地 vLLM（需要 GPU）
 
 ```bash
+# 1. 启动基础设施服务（包含 vLLM）
 docker compose up -d
-```
 
-这会启动：
-- PostgreSQL（端口 5432）
-- Redis（端口 6379）
-- MinIO（端口 9000、9001）
-- vLLM Chat（端口 8000）
-- vLLM Embed（端口 8001）
-- vLLM Rerank（端口 8002）
-
-#### 2. 安装依赖
-
-```bash
-npm install
-```
-
-#### 3. 配置环境变量
-
-```bash
+# 2. 配置环境变量
 cp .env.example .env
-cp server/.env.example server/.env
-```
+# 默认 LLM_PROVIDER=local，无需修改
 
-默认配置即可运行，无需修改。
+# 3. 安装依赖
+npm install
 
-#### 4. 执行数据库迁移
-
-```bash
+# 4. 执行数据库迁移
 npm run db:migrate
-```
 
-#### 5. 启动开发服务器
-
-```bash
+# 5. 启动开发服务器
 npm run dev
 ```
 
-这会同时启动前端和后端服务。
+#### 方式 2：智谱清言（无需 GPU）
 
-#### 6. 访问应用
+```bash
+# 1. 启动基础设施服务（不含 vLLM）
+docker compose -f docker-compose.zhipu.yml up -d
+
+# 2. 配置环境变量
+cp .env.example .env
+# 编辑 .env 文件，设置：
+# LLM_PROVIDER=zhipu
+# ZHIPU_API_KEY=your-api-key-here
+
+# 3. 安装依赖
+npm install
+
+# 4. 执行数据库迁移
+npm run db:migrate
+
+# 5. 启动开发服务器
+npm run dev
+```
+
+### 访问应用
 
 - **前端**：http://localhost:5173
 - **后端 API**：http://localhost:3000/api
@@ -109,6 +123,7 @@ npm run dev
 ### 1. 创建知识库
 
 进入 **Knowledge Base** 页面：
+
 - 创建知识库集合（如"合同法知识库"）
 - 上传文档（TXT/PDF/DOCX）
 - 系统自动分块、向量化、索引
@@ -116,6 +131,7 @@ npm run dev
 ### 2. 创建预审任务
 
 进入 **New Task** 页面：
+
 - 填写合同基本信息（名称、对方、类型）
 - 上传合同文件
 - 选择 KB 集合（可多选）
@@ -125,6 +141,7 @@ npm run dev
 ### 3. 监控处理进度
 
 系统自动处理，可实时查看：
+
 - 当前处理阶段
 - 总体进度条
 - Timeline 日志
@@ -133,6 +150,7 @@ npm run dev
 ### 4. 查看分析结果
 
 **Results 页面**展示：
+
 - 风险统计（高/中/低/信息级）
 - 条款级风险列表
 - 筛选功能
@@ -140,6 +158,7 @@ npm run dev
 ### 5. 人工审核
 
 **Review 页面**支持：
+
 - 左侧：条款/风险列表
 - 右侧：详情 Tab（Overview/Evidence/Actions）
 - 确认/驳回风险
@@ -184,14 +203,17 @@ contract-precheck/
 ## API 接口文档
 
 ### 健康检查
+
 - `GET /api/health` - 检查所有服务健康状态
 
 ### 合同管理
+
 - `POST /api/contracts` - 创建合同
 - `POST /api/contracts/:id/versions` - 上传合同文件
 - `GET /api/contracts/:id` - 获取合同详情
 
 ### 任务管理
+
 - `POST /api/precheck-tasks` - 创建预审任务
 - `GET /api/precheck-tasks/:id` - 获取任务状态
 - `GET /api/precheck-tasks/:id/events` - 获取任务时间线
@@ -201,6 +223,7 @@ contract-precheck/
 - `POST /api/precheck-tasks/:id/conclusion` - 提交审阅结论
 
 ### 知识库
+
 - `POST /api/kb/collections` - 创建 KB 集合
 - `GET /api/kb/collections` - 列出 KB 集合
 - `POST /api/kb/documents` - 上传 KB 文档
@@ -211,16 +234,19 @@ contract-precheck/
 ## 环境变量说明
 
 ### 数据库
+
 ```bash
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/contract_precheck
 ```
 
 ### Redis
+
 ```bash
 REDIS_URL=redis://localhost:6379
 ```
 
 ### MinIO
+
 ```bash
 MINIO_ENDPOINT=localhost
 MINIO_PORT=9000
@@ -229,8 +255,12 @@ MINIO_SECRET_KEY=minioadmin
 MINIO_BUCKET=contract-precheck
 ```
 
-### vLLM
+### 大模型配置
+
+#### 选项 1：本地 vLLM（默认，需要 GPU）
+
 ```bash
+LLM_PROVIDER=local
 VLLM_CHAT_BASE_URL=http://vllm-chat:8000/v1
 VLLM_EMBED_BASE_URL=http://vllm-embed:8001/v1
 VLLM_RERANK_BASE_URL=http://vllm-rerank:8002/v1
@@ -240,7 +270,22 @@ EMBED_MODEL=BAAI/bge-m3
 RERANK_MODEL=BAAI/bge-reranker-v2-m3
 ```
 
+#### 选项 2：智谱清言（云 API，无需 GPU）
+
+```bash
+LLM_PROVIDER=zhipu
+ZHIPU_API_KEY=your-zhipu-api-key-here
+ZHIPU_CHAT_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+ZHIPU_EMBED_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+ZHIPU_RERANK_BASE_URL=https://open.bigmodel.cn/api/paas/v4
+
+ZHIPU_CHAT_MODEL=glm-4-flash
+ZHIPU_EMBED_MODEL=embedding-3
+ZHIPU_RERANK_MODEL=rerank-2
+```
+
 ### 并发配置
+
 ```bash
 ORCHESTRATOR_CONCURRENCY=1
 LLM_RISK_CONCURRENCY=3
@@ -265,11 +310,13 @@ npm test
 ### 当前配置（RTX 4090 24GB）
 
 **Chat 模型**：
+
 - `--gpu-memory-utilization=0.90`
 - `--max-model-len=8192`
 - `--max-num-seqs=8`
 
 **Embed/Rerank 模型**：
+
 - `--gpu-memory-utilization=0.60`
 - `--max-num-seqs=32`
 
@@ -280,6 +327,7 @@ npm test
 ## 故障排查
 
 ### vLLM 启动失败
+
 ```bash
 # 检查 GPU
 nvidia-smi
@@ -292,6 +340,7 @@ sudo apt install nvidia-container-toolkit
 ```
 
 ### 数据库连接失败
+
 ```bash
 # 检查 Postgres 容器
 docker compose ps
@@ -301,6 +350,7 @@ npm run db:migrate
 ```
 
 ### KB 检索无结果
+
 - 确认 KB 文档已上传并完成索引
 - 检查 Worker 日志是否有报错
 - 验证 Embeddings 是否生成（查询 `kb_embeddings` 表）
@@ -329,15 +379,18 @@ npm run docker:logs
 当前版本为 **PoC（概念验证）**，以下功能做了简化：
 
 ### 文件解析
+
 - ✅ TXT：完整实现
 - ⚠️ PDF/DOCX：占位实现（返回提示文本）
   - 扩展点：`server/src/workers/agents/parse.worker.ts`
 
 ### KB Retrieval
+
 - 当前为简化版（占位数据）
 - 生产环境需调用 `retrievalService.retrieveForClause()`
 
 ### Report Agent
+
 - 占位实现，未生成真实报告
 - 扩展点：`server/src/workers/agents/stubWorkers.ts`
 
@@ -345,12 +398,12 @@ npm run docker:logs
 
 ## 性能指标（参考值）
 
-| 操作 | 耗时 |
-|------|------|
-| 文件上传 | < 5s |
-| KB 索引（1000 chunks） | ~ 30s |
-| 单合同分析（10 条款） | ~ 2-3 分钟 |
-| LLM 风险分析（单条款） | ~ 10s |
+| 操作                   | 耗时       |
+| ---------------------- | ---------- |
+| 文件上传               | < 5s       |
+| KB 索引（1000 chunks） | ~ 30s      |
+| 单合同分析（10 条款）  | ~ 2-3 分钟 |
+| LLM 风险分析（单条款） | ~ 10s      |
 
 ## 许可证
 
@@ -364,4 +417,5 @@ MIT
 
 **版本**：v0.1.0 PoC
 **更新时间**：2025-01-21
+
 # contract_os

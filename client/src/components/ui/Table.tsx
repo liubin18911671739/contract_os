@@ -1,4 +1,10 @@
-export function Table({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+export function Table({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return <table className={`min-w-full divide-y divide-gray-200 ${className}`}>{children}</table>;
 }
 

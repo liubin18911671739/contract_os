@@ -62,7 +62,7 @@ export class ReportService {
         <strong>合同名称：</strong>${contractInfo.contract_name || 'N/A'}<br>
         <strong>对方：</strong>${contractInfo.counterparty || 'N/A'}<br>
         <strong>类型：</strong>${contractInfo.contract_type || 'N/A'}<br>
-        <strong>任务ID：</strong>${taskId}<br>
+        <strong>任务ID：</strong>${data.taskId}<br>
         <strong>生成时间：</strong>${new Date().toLocaleString('zh-CN')}
     </div>
 
@@ -98,7 +98,9 @@ export class ReportService {
             </tr>
         </thead>
         <tbody>
-            ${risks.map(risk => `
+            ${risks
+              .map(
+                (risk) => `
             <tr>
                 <td>${risk.title || risk.clause_id}</td>
                 <td><span class="risk-badge risk-${risk.risk_level}">${risk.risk_level}</span></td>
@@ -106,13 +108,17 @@ export class ReportService {
                 <td>${(risk.confidence * 100).toFixed(0)}%</td>
                 <td>${risk.summary || '-'}</td>
             </tr>
-            `).join('')}
+            `
+              )
+              .join('')}
         </tbody>
     </table>
 
     ${risks.length === 0 ? '<p style="color: #28a745; font-size: 18px;">✓ 未发现明显风险</p>' : ''}
 
-    ${review ? `
+    ${
+      review
+        ? `
     <h2>审阅结论</h2>
     <div class="info-box">
         <strong>结论：</strong>${review.conclusion}<br>
@@ -120,16 +126,23 @@ export class ReportService {
         <strong>审阅人：</strong>${review.created_by || 'System'}<br>
         <strong>时间：</strong>${new Date(review.created_at).toLocaleString('zh-CN')}
     </div>
-    ` : ''}
+    `
+        : ''
+    }
 
     <h2>处理时间线</h2>
     <div class="timeline">
-        ${events.slice(-10).map(event => `
+        ${events
+          .slice(-10)
+          .map(
+            (event) => `
         <div class="timeline-item">
             <strong>${event.stage}</strong> - ${event.message}<br>
             <small style="color: #666;">${new Date(event.ts).toLocaleString('zh-CN')}</small>
         </div>
-        `).join('')}
+        `
+          )
+          .join('')}
     </div>
 
     <div class="footer">
@@ -273,7 +286,9 @@ export class ReportService {
     }
 
     // Upload to MinIO
-    const buffer = Buffer.from(typeof content === 'string' ? content : JSON.stringify(content, null, 2));
+    const buffer = Buffer.from(
+      typeof content === 'string' ? content : JSON.stringify(content, null, 2)
+    );
     await minio.putObject(process.env.MINIO_BUCKET || 'contract-precheck', objectKey, buffer, {
       'Content-Type': mimeType,
     });

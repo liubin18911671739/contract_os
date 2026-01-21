@@ -57,11 +57,14 @@ class EvidenceAgent extends BaseAgent {
       }
     }
 
-    logger.info({
-      taskId,
-      totalRisks: risks.length,
-      risksWithEvidence: evidenceCount,
-    }, 'Evidence consolidation completed');
+    logger.info(
+      {
+        taskId,
+        totalRisks: risks.length,
+        risksWithEvidence: evidenceCount,
+      },
+      'Evidence consolidation completed'
+    );
 
     return {
       totalRisks: risks.length,
@@ -138,11 +141,14 @@ class QCAgent extends BaseAgent {
       }
     }
 
-    logger.info({
-      taskId,
-      risksChecked,
-      hallucinationCount,
-    }, 'QC completed');
+    logger.info(
+      {
+        taskId,
+        risksChecked,
+        hallucinationCount,
+      },
+      'QC completed'
+    );
 
     return {
       risksChecked,
@@ -163,9 +169,13 @@ export const rulesWorker = createWorker('precheck.agent.rules', (job) => rulesAg
   concurrency: 2,
 });
 
-export const evidenceWorker = createWorker('precheck.agent.evidence', (job) => evidenceAgent.run(job.data), {
-  concurrency: parseInt(process.env.EVIDENCE_CONCURRENCY || '3'),
-});
+export const evidenceWorker = createWorker(
+  'precheck.agent.evidence',
+  (job) => evidenceAgent.run(job.data),
+  {
+    concurrency: parseInt(process.env.EVIDENCE_CONCURRENCY || '3'),
+  }
+);
 
 export const qcWorker = createWorker('precheck.agent.qc', (job) => qcAgent.run(job.data), {
   concurrency: 2,

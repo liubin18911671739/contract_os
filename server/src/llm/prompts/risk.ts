@@ -7,7 +7,7 @@ export function buildRiskAnalysisPrompt(params: {
   clauseText: string;
   ruleHints: string[];
   kbContexts: Array<{ text: string; docTitle: string }>;
-}): string {
+}): { systemPrompt: string; userPrompt: string } {
   const { clauseText, ruleHints, kbContexts } = params;
 
   const systemPrompt = `You are a legal contract risk analyzer. Your task is to identify potential risks in contract clauses based on legal rules and knowledge base references.

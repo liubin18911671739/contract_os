@@ -15,13 +15,22 @@ function App() {
             <div className="flex items-center space-x-8">
               <h1 className="text-xl font-bold text-gray-900">Contract Pre-check</h1>
               <div className="flex space-x-4">
-                <Link to="/" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                >
                   Dashboard
                 </Link>
-                <Link to="/kb" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/kb"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                >
                   Knowledge Base
                 </Link>
-                <Link to="/new-task" className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium">
+                <Link
+                  to="/new-task"
+                  className="text-gray-700 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                >
                   New Task
                 </Link>
               </div>

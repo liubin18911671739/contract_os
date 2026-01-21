@@ -56,7 +56,11 @@ export function validateRiskAnalysis(data: unknown): RiskAnalysis {
   return RiskAnalysisSchema.parse(data);
 }
 
-export function safeValidateRiskAnalysis(data: unknown): { success: boolean; data?: RiskAnalysis; error?: string } {
+export function safeValidateRiskAnalysis(data: unknown): {
+  success: boolean;
+  data?: RiskAnalysis;
+  error?: string;
+} {
   try {
     return { success: true, data: RiskAnalysisSchema.parse(data) };
   } catch (error) {

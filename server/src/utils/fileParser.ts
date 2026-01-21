@@ -55,7 +55,9 @@ export class FileParser {
         },
       };
     } catch (error) {
-      throw new Error(`PDF parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `PDF parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -67,7 +69,7 @@ export class FileParser {
       const result = await mammoth.extractRawText({ buffer: file });
 
       if (result.messages && result.messages.length > 0) {
-        const warnings = result.messages.filter(m => m.type === 'warning');
+        const warnings = result.messages.filter((m) => m.type === 'warning');
         if (warnings.length > 0) {
           console.warn(`DOCX parsing warnings for ${filename}:`, warnings);
         }
@@ -80,7 +82,9 @@ export class FileParser {
         },
       };
     } catch (error) {
-      throw new Error(`DOCX parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `DOCX parsing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 

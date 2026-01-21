@@ -98,34 +98,39 @@ export class TaskService {
       errorMessage?: string;
     }
   ): Promise<void> {
+    // Build dynamic SET clause using parameters
     const setClauses: string[] = [];
-    const values: (string | number)[] = [];
+    const params: any[] = [];
+    let paramIndex = 1;
 
     if (updates.status !== undefined) {
-      setClauses.push(`status = $${values.length + 1}`);
-      values.push(updates.status);
+      setClauses.push(`status = $${paramIndex++}`);
+      params.push(updates.status);
     }
     if (updates.progress !== undefined) {
-      setClauses.push(`progress = $${values.length + 1}`);
-      values.push(updates.progress);
+      setClauses.push(`progress = $${paramIndex++}`);
+      params.push(updates.progress);
     }
     if (updates.currentStage !== undefined) {
-      setClauses.push(`current_stage = $${values.length + 1}`);
-      values.push(updates.currentStage);
+      setClauses.push(`current_stage = $${paramIndex++}`);
+      params.push(updates.currentStage);
     }
     if (updates.errorMessage !== undefined) {
-      setClauses.push(`error_message = $${values.length + 1}`);
-      values.push(updates.errorMessage);
+      setClauses.push(`error_message = $${paramIndex++}`);
+      params.push(updates.errorMessage);
     }
 
+    // Always update timestamp
     setClauses.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(taskId);
 
-    await sql`
-      UPDATE precheck_tasks
-      SET ${sql.unsafe(setClauses.join(',\n      '))}
-      WHERE id = ${taskId}
-    `;
+    // Add taskId as the last parameter
+    params.push(taskId);
+
+    // Execute the query
+    await sql.unsafe(
+      `UPDATE precheck_tasks SET ${setClauses.join(', ')} WHERE id = $${paramIndex}`,
+      params
+    );
   }
 
   async setCancelRequested(taskId: string): Promise<void> {

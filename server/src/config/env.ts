@@ -1,7 +1,11 @@
 /**
  * Environment configuration with validation
  */
+import { config } from 'dotenv';
 import { z } from 'zod';
+
+// Load .env file from parent directory (project root)
+config({ path: '../.env' });
 
 const envSchema = z.object({
   // Database
@@ -18,16 +22,30 @@ const envSchema = z.object({
   MINIO_BUCKET: z.string(),
   MINIO_USE_SSL: z.string().transform((v) => v === 'true'),
 
-  // vLLM
-  VLLM_API_KEY: z.string().default('token-local'),
-  VLLM_CHAT_BASE_URL: z.string().url(),
-  VLLM_EMBED_BASE_URL: z.string().url(),
-  VLLM_RERANK_BASE_URL: z.string().url(),
+  // LLM Provider
+  LLM_PROVIDER: z.enum(['local', 'zhipu']).default('local'),
 
-  // Models
+  // vLLM (local provider)
+  VLLM_API_KEY: z.string().default('token-local'),
+  VLLM_CHAT_BASE_URL: z.string().url().optional(),
+  VLLM_EMBED_BASE_URL: z.string().url().optional(),
+  VLLM_RERANK_BASE_URL: z.string().url().optional(),
+
+  // Zhipu Qingyan (zhipu provider)
+  ZHIPU_API_KEY: z.string().optional(),
+  ZHIPU_CHAT_BASE_URL: z.string().url().optional(),
+  ZHIPU_EMBED_BASE_URL: z.string().url().optional(),
+  ZHIPU_RERANK_BASE_URL: z.string().url().optional(),
+
+  // Models (local vLLM)
   RISK_LLM_MODEL: z.string().default('Qwen/Qwen2.5-7B-Instruct'),
   EMBED_MODEL: z.string().default('BAAI/bge-m3'),
   RERANK_MODEL: z.string().default('BAAI/bge-reranker-v2-m3'),
+
+  // Models (Zhipu Qingyan)
+  ZHIPU_CHAT_MODEL: z.string().default('glm-4-flash'),
+  ZHIPU_EMBED_MODEL: z.string().default('embedding-3'),
+  ZHIPU_RERANK_MODEL: z.string().default('rerank-2'),
 
   // Server
   SERVER_PORT: z.string().transform(Number).default('3000'),

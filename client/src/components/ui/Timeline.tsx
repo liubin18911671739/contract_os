@@ -16,9 +16,7 @@ export function Timeline({ events }: TimelineProps) {
           <div className={`w-3 h-3 rounded-full border-2 ${levelColors[event.level]} mt-1.5`} />
           <div className="flex-1">
             <div className="text-sm text-gray-900">{event.message}</div>
-            <div className="text-xs text-gray-500">
-              {new Date(event.ts).toLocaleString()}
-            </div>
+            <div className="text-xs text-gray-500">{new Date(event.ts).toLocaleString()}</div>
           </div>
         </div>
       ))}

@@ -24,9 +24,13 @@ async function waitForPostgres(): Promise<void> {
 
   while (attempts < maxAttempts) {
     try {
-      const sql = postgres(process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/contract_precheck', {
-        max: 1,
-      });
+      const sql = postgres(
+        process.env.DATABASE_URL ||
+          'postgresql://postgres:postgres@localhost:5432/contract_precheck',
+        {
+          max: 1,
+        }
+      );
       await sql`SELECT 1`;
       await sql.end();
       console.log('✓ PostgreSQL is ready');
@@ -34,7 +38,7 @@ async function waitForPostgres(): Promise<void> {
       return;
     } catch (error) {
       attempts++;
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
   throw new Error('PostgreSQL connection timeout');
@@ -54,7 +58,7 @@ async function waitForRedis(): Promise<void> {
       return;
     } catch (error) {
       attempts++;
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
   throw new Error('Redis connection timeout');
@@ -79,7 +83,7 @@ async function waitForMinio(): Promise<void> {
       return;
     } catch (error) {
       attempts++;
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
   throw new Error('MinIO connection timeout');
@@ -109,7 +113,7 @@ async function waitForVLLM(name: string, url: string): Promise<void> {
       if (attempts % 10 === 0) {
         console.log(`Waiting for vLLM ${name}... (${attempts}/${maxAttempts})`);
       }
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
   throw new Error(`vLLM ${name} connection timeout`);

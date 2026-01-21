@@ -25,7 +25,11 @@ export async function post<T>(path: string, data?: any): Promise<T> {
   return response.json();
 }
 
-export async function uploadFile<T>(path: string, file: File, additionalData: Record<string, string> = {}): Promise<T> {
+export async function uploadFile<T>(
+  path: string,
+  file: File,
+  additionalData: Record<string, string> = {}
+): Promise<T> {
   const formData = new FormData();
   formData.append('file', file);
   Object.entries(additionalData).forEach(([key, value]) => {

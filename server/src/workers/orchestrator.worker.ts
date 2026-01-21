@@ -1,7 +1,7 @@
 /**
  * Orchestrator worker - manages task state machine
  */
-import { queues, createWorker } from '../queues/index.js';
+import { queues, queueEvents, createWorker } from '../queues/index.js';
 import { taskService } from '../services/taskService.js';
 import { generateId } from '../utils/hash.js';
 import { logger } from '../config/logger.js';
@@ -38,7 +38,11 @@ async function processOrchestrator(job: { data: AgentJobData }): Promise<AgentRe
     });
   }
 
-  const orchestratorState = state.get(taskId)!;
+  const orchestratorState = state.get(taskId);
+  if (!orchestratorState) {
+    throw new Error(`Orchestrator state not found for task: ${taskId}`);
+  }
+
   let completed = false;
   let failed = false;
 
@@ -82,22 +86,18 @@ async function processOrchestrator(job: { data: AgentJobData }): Promise<AgentRe
         throw new Error(`Queue not found: ${queueName}`);
       }
 
-      const stageJob = await queue.add(
+      const stageJob = await queue.add(stage, {
+        taskId,
+        traceId: generateId('trace'),
         stage,
-        {
-          taskId,
-          traceId: generateId('trace'),
-          stage,
-          payload: {},
-        },
-        {
-          timeout: 5 * 60 * 1000, // 5 minutes per stage
-        }
-      );
+        payload: {},
+      });
 
-      // Wait for completion
-      const result = await stageJob.waitUntilFinished();
-      const agentResult = result as AgentResult;
+      // Wait for completion with timeout
+      const queueEventsName = `precheck.agent.${stage.toLowerCase()}` as keyof typeof queueEvents;
+      const events = queueEvents[queueEventsName];
+      const result = await stageJob.waitUntilFinished(events, 5 * 60 * 1000); // 5 minutes timeout
+      const agentResult = result as unknown as AgentResult;
 
       if (!agentResult.ok) {
         // Check if retryable

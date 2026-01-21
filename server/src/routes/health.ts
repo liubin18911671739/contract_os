@@ -8,6 +8,22 @@ import { checkMinioHealth } from '../config/minio.js';
 import { modelGateway } from '../llm/modelGateway.js';
 
 export async function healthRoutes(fastify: FastifyInstance) {
+  // Root API endpoint
+  fastify.get('/', async (request, reply) => {
+    reply.send({
+      name: 'Contract Pre-check API',
+      version: '0.3.1',
+      endpoints: {
+        health: '/api/health',
+        tasks: '/api/tasks',
+        contracts: '/api/contracts',
+        kb: '/api/kb',
+        reports: '/api/reports',
+      },
+    });
+  });
+
+  // Health check endpoint
   fastify.get('/health', async (request, reply) => {
     const startTime = Date.now();
 

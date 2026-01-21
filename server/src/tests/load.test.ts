@@ -4,7 +4,7 @@
  * This file contains performance benchmarks and load testing scenarios.
  * Run with: npm run test:load
  */
-import { describe } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 // Simple performance benchmarks
@@ -22,7 +22,9 @@ describe('Performance Benchmarks', () => {
     const elapsed = Date.now() - start;
     const avgTime = elapsed / iterations;
 
-    console.log(`SHA256 hash: ${avgTime.toFixed(3)}ms per operation (${iterations} ops in ${elapsed}ms)`);
+    console.log(
+      `SHA256 hash: ${avgTime.toFixed(3)}ms per operation (${iterations} ops in ${elapsed}ms)`
+    );
 
     // Should be very fast (< 1ms per operation)
     assert.ok(avgTime < 1, 'Hashing should be fast');
@@ -42,7 +44,9 @@ describe('Performance Benchmarks', () => {
     const elapsed = Date.now() - start;
     const avgTime = elapsed / iterations;
 
-    console.log(`ID generation: ${avgTime.toFixed(3)}ms per operation (${iterations} ops in ${elapsed}ms)`);
+    console.log(
+      `ID generation: ${avgTime.toFixed(3)}ms per operation (${iterations} ops in ${elapsed}ms)`
+    );
 
     assert.ok(avgTime < 0.1, 'ID generation should be very fast');
     assert.strictEqual(ids.length, iterations);
@@ -50,12 +54,14 @@ describe('Performance Benchmarks', () => {
   });
 
   it('should paginate quickly', async () => {
-    const { buildPaginationResult } = await import('../utils/pagination.js');
+    const { buildPaginationResult, parsePagination } = await import('../utils/pagination.js');
 
-    const data = Array.from({ length: 100 }, (_, i) => ({ id: i + 1 }));
+    const allData = Array.from({ length: 100 }, (_, i) => ({ id: i + 1 }));
+    const { page, limit, offset } = parsePagination({ page: 1, limit: 10 });
 
     const start = Date.now();
-    const result = buildPaginationResult(data, 1, 10, 100);
+    const paginatedData = allData.slice(offset, offset + limit);
+    const result = buildPaginationResult(paginatedData, page, limit, allData.length);
     const elapsed = Date.now() - start;
 
     console.log(`Pagination: ${elapsed}ms for 100 items`);
@@ -82,7 +88,9 @@ describe('Load Testing Scenarios', () => {
     const elapsed = Date.now() - start;
     const avgTime = elapsed / iterations;
 
-    console.log(`Text truncation: ${avgTime.toFixed(3)}ms per operation (${iterations} ops in ${elapsed}ms)`);
+    console.log(
+      `Text truncation: ${avgTime.toFixed(3)}ms per operation (${iterations} ops in ${elapsed}ms)`
+    );
 
     assert.ok(avgTime < 1, 'Text truncation should be fast');
   });

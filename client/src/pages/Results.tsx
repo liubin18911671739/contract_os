@@ -1,10 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getTask, getTaskSummary, getTaskClauses, generateReport, getReportDownloadUrl } from '../api/tasks';
+import {
+  getTask,
+  getTaskSummary,
+  getTaskClauses,
+  generateReport,
+  getReportDownloadUrl,
+} from '../api/tasks';
 import { Button } from '../components/ui/Button';
 import { RiskBadge } from '../components/ui/Badge';
 import { Alert } from '../components/ui/Alert';
-import { Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '../components/ui/Table';
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '../components/ui/Table';
 
 export default function Results() {
   const { taskId } = useParams<{ taskId: string }>();
@@ -14,7 +27,10 @@ export default function Results() {
   const [clauses, setClauses] = useState<any[]>([]);
   const [filter, setFilter] = useState<string>('');
   const [generatingReport, setGeneratingReport] = useState(false);
-  const [reportMessage, setReportMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [reportMessage, setReportMessage] = useState<{
+    type: 'success' | 'error';
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!taskId) return;
@@ -84,28 +100,23 @@ export default function Results() {
               >
                 {generatingReport ? 'Generating...' : '📄 HTML Report'}
               </Button>
-              <Button
-                onClick={() => handleGenerateReport('json')}
-                disabled={generatingReport}
-              >
+              <Button onClick={() => handleGenerateReport('json')} disabled={generatingReport}>
                 {generatingReport ? 'Generating...' : '📊 JSON Report'}
               </Button>
             </>
           )}
-          <Button variant="ghost" onClick={() => navigate('/')}>Back to Dashboard</Button>
+          <Button variant="ghost" onClick={() => navigate('/')}>
+            Back to Dashboard
+          </Button>
         </div>
       </div>
 
-      {reportMessage && (
-        <Alert type={reportMessage.type}>
-          {reportMessage.text}
-        </Alert>
-      )}
+      {reportMessage && <Alert type={reportMessage.type}>{reportMessage.text}</Alert>}
 
       {!isTaskComplete && (
         <Alert type="info">
-          Task is still in progress. Reports can be generated once analysis is complete.
-          Current status: <strong>{task.status}</strong> ({task.progress}%)
+          Task is still in progress. Reports can be generated once analysis is complete. Current
+          status: <strong>{task.status}</strong> ({task.progress}%)
         </Alert>
       )}
 
@@ -171,7 +182,9 @@ export default function Results() {
                   <TableCell>
                     <div className="max-w-md truncate">{clause.summary || 'No risk detected'}</div>
                   </TableCell>
-                  <TableCell>{clause.risk_level ? <RiskBadge level={clause.risk_level} /> : '-'}</TableCell>
+                  <TableCell>
+                    {clause.risk_level ? <RiskBadge level={clause.risk_level} /> : '-'}
+                  </TableCell>
                   <TableCell>
                     <span
                       className={`text-xs px-2 py-1 rounded-full ${
@@ -203,13 +216,24 @@ export default function Results() {
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <h3 className="font-medium text-blue-900 mb-2">📥 Reports</h3>
           <p className="text-sm text-blue-800 mb-3">
-            Generate downloadable reports in HTML or JSON format. HTML reports include full formatting and can be printed or shared.
+            Generate downloadable reports in HTML or JSON format. HTML reports include full
+            formatting and can be printed or shared.
           </p>
           <div className="flex gap-2">
-            <Button size="sm" variant="secondary" onClick={() => handleGenerateReport('html')} disabled={generatingReport}>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => handleGenerateReport('html')}
+              disabled={generatingReport}
+            >
               Generate HTML
             </Button>
-            <Button size="sm" variant="secondary" onClick={() => handleGenerateReport('json')} disabled={generatingReport}>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => handleGenerateReport('json')}
+              disabled={generatingReport}
+            >
               Generate JSON
             </Button>
           </div>

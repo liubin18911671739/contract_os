@@ -12,9 +12,5 @@ export function Alert({ type = 'info', children, className = '' }: AlertProps) {
     success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
   };
 
-  return (
-    <div className={`border rounded-lg p-4 ${styles[type]} ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`border rounded-lg p-4 ${styles[type]} ${className}`}>{children}</div>;
 }
