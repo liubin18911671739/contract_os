@@ -1,0 +1,149 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: contract-precheck-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: contract_precheck
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: contract-precheck-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: contract-precheck-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  vllm-chat:
+    image: vllm/vllm-openai:v0.6.0
+    container_name: contract-precheck-vllm-chat
+    runtime: nvidia
+    environment:
+      - VLLM_TENSORParallel_SIZE=1
+    ports:
+      - "8000:8000"
+    volumes:
+      - model_cache:/root/.cache/huggingface
+    command: >
+      --model Qwen/Qwen2.5-7B-Instruct
+      --gpu-memory-utilization 0.90
+      --max-model-len 8192
+      --max-num-seqs 8
+      --max-num-batched-tokens 8192
+      --dtype auto
+      --host 0.0.0.0
+      --port 8000
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  vllm-embed:
+    image: vllm/vllm-openai:v0.6.0
+    container_name: contract-precheck-vllm-embed
+    runtime: nvidia
+    environment:
+      - VLLM_TENSORParallel_SIZE=1
+    ports:
+      - "8001:8001"
+    volumes:
+      - model_cache:/root/.cache/huggingface
+    command: >
+      --model BAAI/bge-m3
+      --gpu-memory-utilization 0.60
+      --max-num-seqs 32
+      --dtype auto
+      --host 0.0.0.0
+      --port 8001
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  vllm-rerank:
+    image: vllm/vllm-openai:v0.6.0
+    container_name: contract-precheck-vllm-rerank
+    runtime: nvidia
+    environment:
+      - VLLM_TENSORParallel_SIZE=1
+    ports:
+      - "8002:8002"
+    volumes:
+      - model_cache:/root/.cache/huggingface
+    command: >
+      --model BAAI/bge-reranker-v2-m3
+      --gpu-memory-utilization 0.60
+      --max-num-seqs 32
+      --dtype auto
+      --host 0.0.0.0
+      --port 8002
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+volumes:
+  postgres_data:
+  minio_data:
+  model_cache:
