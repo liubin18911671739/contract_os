@@ -419,3 +419,28 @@ MIT
 **更新时间**：2025-01-21
 
 # contract_os
+docker exec -i contract-precheck-redis redis-cli FLUSHALL
+
+、docker exec -i contract-precheck-db psql -U postgres -d contract_precheck -c "
+SELECT 
+  'contracts' as table_name, COUNT(*) as count FROM contracts
+UNION ALL SELECT 'contract_versions', COUNT(*) FROM contract_versions
+UNION ALL SELECT 'precheck_tasks', COUNT(*) FROM precheck_tasks
+UNION ALL SELECT 'task_events', COUNT(*) FROM task_events
+UNION ALL SELECT 'clauses', COUNT(*) FROM clauses
+UNION ALL SELECT 'risks', COUNT(*) FROM risks
+UNION ALL SELECT 'rule_hits', COUNT(*) FROM rule_hits
+UNION ALL SELECT 'evidences', COUNT(*) FROM evidences
+UNION ALL SELECT 'config_snapshots', COUNT(*) FROM config_snapshots
+UNION ALL SELECT 'task_kb_snapshots', COUNT(*) FROM task_kb_snapshots
+UNION ALL SELECT 'kb_collections', COUNT(*) FROM kb_collections
+UNION ALL SELECT 'kb_documents', COUNT(*) FROM kb_documents
+UNION ALL SELECT 'kb_chunks', COUNT(*) FROM kb_chunks
+UNION ALL SELECT 'kb_embeddings', COUNT(*) FROM kb_embeddings
+UNION ALL SELECT 'kb_citations', COUNT(*) FROM kb_citations
+UNION ALL SELECT 'kb_hits_temp', COUNT(*) FROM kb_hits_temp
+UNION ALL SELECT 'reports', COUNT(*) FROM reports
+UNION ALL SELECT 'reviews', COUNT(*) FROM reviews
+UNION ALL SELECT 'suggestions', COUNT(*) FROM suggestions
+UNION ALL SELECT 'audit_logs', COUNT(*) FROM audit_logs;
+"

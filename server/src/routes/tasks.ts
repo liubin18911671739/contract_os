@@ -8,6 +8,80 @@ import { sql } from '../config/db.js';
 import { CreatePrecheckTaskSchema } from '../schemas/task.js';
 
 export async function taskRoutes(fastify: FastifyInstance) {
+  // List tasks with pagination and filters
+  fastify.get('/precheck-tasks', async (request, reply) => {
+    const {
+      page = '1',
+      limit = '10',
+      status,
+      sort_by = 'created_at',
+      sort_order = 'DESC',
+    } = request.query as {
+      page?: string;
+      limit?: string;
+      status?: string;
+      sort_by?: string;
+      sort_order?: string;
+    };
+
+    const pageNum = Math.max(1, parseInt(page, 10));
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+    const offset = (pageNum - 1) * limitNum;
+
+    // Validate sort_by and sort_order
+    const validSortFields = ['created_at', 'updated_at', 'status', 'progress'];
+    const validSortOrders = ['ASC', 'DESC'];
+
+    const sortField = validSortFields.includes(sort_by) ? sort_by : 'created_at';
+    const sortDir = validSortOrders.includes(sort_order.toUpperCase()) ? sort_order.toUpperCase() : 'DESC';
+
+    // Build query
+    let countQuery = sql`SELECT COUNT(*) as count FROM precheck_tasks`;
+    let tasksQuery = sql`
+      SELECT
+        pt.id,
+        c.contract_name,
+        pt.status,
+        pt.progress,
+        pt.current_stage,
+        pt.created_at,
+        pt.updated_at
+      FROM precheck_tasks pt
+      LEFT JOIN contract_versions cv ON pt.contract_version_id = cv.id
+      LEFT JOIN contracts c ON cv.contract_id = c.id
+    `;
+
+    if (status) {
+      countQuery = sql`${countQuery} WHERE status = ${status}`;
+      tasksQuery = sql`${tasksQuery} WHERE pt.status = ${status}`;
+    }
+
+    // Get total count
+    const [countResult] = await countQuery;
+    const total = Number(countResult?.count || 0);
+
+    // Add sorting and pagination
+    const orderByClause = sql.unsafe(`ORDER BY pt.${sortField} ${sortDir}`);
+    tasksQuery = sql`${tasksQuery} ${orderByClause} LIMIT ${limitNum} OFFSET ${offset}`;
+
+    const tasks = await tasksQuery;
+
+    reply.send({
+      tasks: tasks.map((t: any) => ({
+        id: t.id,
+        contract_name: t.contract_name || 'Unknown Contract',
+        status: t.status,
+        progress: t.progress,
+        current_stage: t.current_stage,
+        created_at: t.created_at.toISOString(),
+        updated_at: t.updated_at.toISOString(),
+      })),
+      total,
+      page: pageNum,
+      limit: limitNum,
+    });
+  });
+
   // Create task
   fastify.post('/precheck-tasks', async (request, reply) => {
     const data = CreatePrecheckTaskSchema.parse(request.body);

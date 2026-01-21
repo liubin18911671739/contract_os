@@ -259,29 +259,47 @@ API:
 
 - `health.ts` - Health checks
 - `contracts.ts` - Contract CRUD
-- `tasks.ts` - Task lifecycle
-- `kb.ts` - Knowledge base operations
+- `tasks.ts` - Task lifecycle + pagination
+- `kb.ts` - Knowledge base operations + vectorization status
 - `reports.ts` - Report generation/download
+- `dashboard.ts` - NEW: Stats aggregation, recent tasks
+- `metrics.ts` - NEW: Evaluation metrics, F1 score, hallucination rate
 
 All routes use Zod schemas for request validation (`server/src/schemas/`).
 
 ## Frontend Architecture
 
+**Layout System** (Recently refactured to LegalOS design - 2025-01-22):
+
+- **Sidebar** (`components/layout/Sidebar.tsx`): Dark navy (#1E293B), collapsible, navigation with lucide-react icons
+- **Header** (`components/layout/Header.tsx`): Search bar, notification bell with badge, user avatar dropdown
+- **MainLayout** (`components/layout/MainLayout.tsx`): Composes layout, manages active nav state via useLocation
+- **Design Tokens**: Custom Tailwind config (see `client/tailwind.config.ts`)
+  - Colors: `sidebar: #1E293B`, `content: #F8FAFC`, `accent: #3B82F6`
+  - Font: Inter (Google Fonts)
+  - Icons: lucide-react (500+ tree-shakeable icons)
+
 **Pages**: `client/src/pages/`
 
-- `Dashboard.tsx` - Task list with status filtering
-- `KBAdmin.tsx` - KB collection management
-- `NewTaskUpload.tsx` - Contract upload + task creation
-- `Processing.tsx` - Real-time progress monitoring
+- `Dashboard.tsx` - Stats cards with trends, recent analysis table, Chinese labels
+- `KBAdmin.tsx` - KB collections with vectorization status (pending/chunking/indexing/ready/failed)
+- `NewTaskUpload.tsx` - Drag-drop file upload, feature cards, modern form layout
+- `Processing.tsx` - Multi-agent workflow visualization, real-time progress tracking
 - `Results.tsx` - Risk display with filtering
 - `Review.tsx` - Manual review interface
+- `Evaluation.tsx` - NEW: Metrics dashboard with charts (recharts)
 
 **UI Components**: `client/src/components/ui/`
 
-- Atomic components with TailwindCSS styling
-- `Table` component supports `colSpan` and `className` props
+- **New**: `Card`, `StatsCard` (with trends), `Avatar`
+- **Existing**: `Button`, `Table`, `Badge`, `ProgressBar`, `Modal`, `Input`, `Select`, `Alert`
+- All components use TailwindCSS with custom design tokens
+
+**Charts**: recharts library for bar/line/pie charts in Evaluation page
 
 **State Management**: React hooks (useState, useEffect) - no external state library
+
+**API Client**: `client/src/api/` - fetch wrapper functions for all backend endpoints
 
 ## Type System Notes
 
@@ -440,6 +458,13 @@ npm run build
 - **v0.1.0 PoC** (2025-01-21): Initial PoC
 - **v0.2.0** (2025-01-21): PDF/DOCX parsing, KB Retrieval, Report Agent, enhanced tests
 - **v0.3.0** (2025-01-21): Report download API, frontend report buttons, performance testing, E2E framework
+- **v0.3.1** (2025-01-22): Major UI refactoring to LegalOS design
+  - New layout: Sidebar + Header + Content (replaced old top nav)
+  - New components: StatsCard, Card, Avatar with lucide-react icons
+  - New backend endpoints: `/api/dashboard/*`, `/api/metrics/*`
+  - All pages refactored to Chinese labels + modern card layout
+  - KB endpoints enhanced with vectorization status tracking
+  - New Evaluation page with charts (recharts)
 
 ## GPU Configuration (RTX 4090 24GB)
 

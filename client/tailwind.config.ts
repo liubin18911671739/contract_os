@@ -3,6 +3,9 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
       colors: {
         primary: {
           50: '#eff6ff',
@@ -16,6 +19,9 @@ export default {
           800: '#1e40af',
           900: '#1e3a8a',
         },
+        sidebar: '#1E293B',
+        content: '#F8FAFC',
+        accent: '#3B82F6',
       },
     },
   },
