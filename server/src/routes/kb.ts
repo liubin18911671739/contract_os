@@ -97,27 +97,59 @@ export async function kbRoutes(fastify: FastifyInstance) {
 
   // Upload document
   fastify.post('/kb/documents', async (request, reply) => {
-    const data = request.body as any;
+    try {
+      const data = await request.file();
 
-    if (!data.file) {
-      reply.code(400).send({ error: 'No file uploaded' });
-      return;
+      if (!data) {
+        console.log('[KB Upload] No file uploaded');
+        reply.code(400).send({ error: 'No file uploaded' });
+        return;
+      }
+
+      // Get form fields
+      const fields = data.fields as any;
+      const collection_id = fields.collection_id?.value;
+      const title = fields.title?.value;
+      const doc_type = fields.doc_type?.value || 'unknown';
+
+      console.log('[KB Upload] Received:', {
+        filename: data.filename,
+        collection_id,
+        title,
+        doc_type,
+        hasFields: !!fields
+      });
+
+      if (!collection_id) {
+        console.log('[KB Upload] Missing collection_id');
+        reply.code(400).send({ error: 'Missing collection_id' });
+        return;
+      }
+
+      // Convert file to buffer
+      const buffer = await data.toBuffer();
+
+      // Upload document
+      const docId = await kbService.uploadDocument(
+        collection_id,
+        buffer,
+        data.filename,
+        title || data.filename,
+        doc_type
+      );
+
+      console.log('[KB Upload] Success:', docId);
+
+      // Queue ingest and index
+      await queues.kbIngest.add('ingest', { documentId: docId });
+      await queues.kbIndex.add('index', { documentId: docId });
+
+      reply.code(201).send({ id: docId });
+    } catch (error) {
+      console.error('[KB Upload] Error:', error);
+      request.log.error(error);
+      reply.code(500).send({ error: 'Failed to upload document' });
     }
-
-    const file = await data.file.toBuffer();
-    const docId = await kbService.uploadDocument(
-      data.collection_id,
-      file,
-      data.file.filename,
-      data.title || data.file.filename,
-      data.doc_type || 'unknown'
-    );
-
-    // Queue ingest and index
-    await queues.kbIngest.add('ingest', { documentId: docId });
-    await queues.kbIndex.add('index', { documentId: docId });
-
-    reply.code(201).send({ id: docId });
   });
 
   // List documents with vectorization status

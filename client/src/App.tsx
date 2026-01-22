@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { MainLayout } from './components/layout/MainLayout';
+import MainLayout from './components/layout/MainLayout';
 import Dashboard from './pages/Dashboard';
 import KBAdmin from './pages/KBAdmin';
 import NewTaskUpload from './pages/NewTaskUpload';
@@ -7,6 +7,7 @@ import Processing from './pages/Processing';
 import Results from './pages/Results';
 import Review from './pages/Review';
 import Evaluation from './pages/Evaluation';
+import Settings from './pages/Settings';
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <Route path="/results/:taskId" element={<Results />} />
         <Route path="/review/:taskId" element={<Review />} />
         <Route path="/evaluation" element={<Evaluation />} />
-        <Route path="/settings" element={<div>设置 - Coming Soon</div>} />
+        <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </MainLayout>

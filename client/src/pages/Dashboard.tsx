@@ -41,37 +41,90 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [tasks, setTasks] = useState<RecentTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchData() {
       try {
+        setError(null);
+
         // Fetch stats
         const statsRes = await fetch('/api/dashboard/stats');
+        if (!isMounted) return;
+
         if (statsRes.ok) {
           const statsData = await statsRes.json();
           setStats(statsData);
+        } else if (statsRes.status === 500) {
+          setError('数据库服务不可用，请检查 Docker 服务是否运行');
+          setLoading(false);
+          return; // Stop early on error
         }
 
-        // Fetch recent tasks
+        // Only fetch tasks if stats succeeded
         const tasksRes = await fetch('/api/dashboard/recent-tasks?page=1&limit=5');
+        if (!isMounted) return;
+
         if (tasksRes.ok) {
           const tasksData = await tasksRes.json();
           setTasks(tasksData.tasks || []);
+        } else if (tasksRes.status === 500) {
+          setError('数据库服务不可用，请检查 Docker 服务是否运行');
         }
-      } catch (error) {
-        console.error('Failed to fetch dashboard data:', error);
+      } catch (err) {
+        if (isMounted) {
+          console.error('Failed to fetch dashboard data:', err);
+          setError('网络连接失败，请检查后端服务是否运行');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
+        <div className="text-gray-500">加载中...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">欢迎回来</h1>
+          <p className="text-gray-600 mt-1">这是您的合同法律分析系统概览</p>
+        </div>
+
+        {/* Error Message */}
+        <Card>
+          <CardBody>
+            <div className="text-center py-8">
+              <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">服务暂不可用</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <div className="text-sm text-gray-500 space-y-2">
+                <p>请运行以下命令启动数据库服务：</p>
+                <code className="block bg-gray-100 px-4 py-2 rounded text-left">
+                  npm run docker:up
+                </code>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
       </div>
     );
   }

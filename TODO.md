@@ -138,7 +138,7 @@
 - [x] **设计系统**（✅ 已完成 v0.3.1）：
   - TailwindCSS 自定义配置
   - 颜色令牌：sidebar、content、accent
-  - 字体：Inter（Google Fonts）
+  - 字体：系统字体栈（移除 Google Fonts 依赖）
   - 图标库：lucide-react（500+ 图标）
 - [x] **数据可视化**（✅ 已完成 v0.3.1）：
   - recharts 集成（柱状图、折线图、饼图）

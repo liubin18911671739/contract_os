@@ -46,6 +46,7 @@ export default function KBAdmin() {
   const [showUploadDoc, setShowUploadDoc] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({ name: '', scope: 'GLOBAL' });
+  const [selectedCollectionId, setSelectedCollectionId] = useState('');
 
   useEffect(() => {
     loadData();
@@ -78,16 +79,27 @@ export default function KBAdmin() {
 
   async function handleUploadDocument(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedFile || !formData.name) return;
+    if (!selectedFile || !selectedCollectionId) {
+      console.error('Missing file or collection:', { selectedFile: !!selectedFile, selectedCollectionId });
+      return;
+    }
 
     try {
-      await uploadKBDocument(formData.name, selectedFile, selectedFile.name);
+      await uploadKBDocument(selectedCollectionId, selectedFile, selectedFile.name);
       setShowUploadDoc(false);
       setSelectedFile(null);
+      setSelectedCollectionId('');
       loadData();
     } catch (error) {
       console.error('Failed to upload document:', error);
+      // Don't clear state on error, let user see what they tried to upload
     }
+  }
+
+  function openUploadModal() {
+    setSelectedFile(null);
+    setSelectedCollectionId('');
+    setShowUploadDoc(true);
   }
 
   // Calculate totals
@@ -120,7 +132,7 @@ export default function KBAdmin() {
           <h1 className="text-2xl font-bold text-gray-900">知识库管理</h1>
           <p className="text-gray-600 mt-1">管理法规、案例和文档</p>
         </div>
-        <Button onClick={() => setShowUploadDoc(true)}>
+        <Button onClick={openUploadModal}>
           <Upload className="w-4 h-4 mr-2" />
           上传文档
         </Button>
@@ -282,13 +294,21 @@ export default function KBAdmin() {
       </Modal>
 
       {/* Upload Document Modal */}
-      <Modal isOpen={showUploadDoc} onClose={() => setShowUploadDoc(false)} title="上传文档">
+      <Modal
+        isOpen={showUploadDoc}
+        onClose={() => {
+          setShowUploadDoc(false);
+          setSelectedFile(null);
+          setSelectedCollectionId('');
+        }}
+        title="上传文档"
+      >
         <form onSubmit={handleUploadDocument} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">集合</label>
             <Select
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              value={selectedCollectionId}
+              onChange={(e) => setSelectedCollectionId(e.target.value)}
               required
             >
               <option value="">选择集合</option>
