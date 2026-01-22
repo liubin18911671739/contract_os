@@ -34,7 +34,7 @@ export function Sidebar({ activeItem }: SidebarProps) {
 
   return (
     <aside
-      className={`flex flex-col bg-sidebar text-white transition-all duration-300 ${
+      className={`flex-shrink-0 flex flex-col bg-sidebar text-white transition-all duration-300 ${
         collapsed ? 'w-20' : 'w-64'
       }`}
     >

@@ -34,7 +34,7 @@ function LayoutContent({ children }: MainLayoutProps) {
   const { settings } = useSettings();
 
   return (
-    <>
+    <div className="flex h-screen overflow-hidden">
       <Sidebar activeItem={activeItem} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
@@ -42,11 +42,11 @@ function LayoutContent({ children }: MainLayoutProps) {
           userName={settings.user.name}
           userDepartment={settings.user.department}
         />
-        <main className="flex-1 overflow-auto bg-content p-6">
+        <main className="flex-1 overflow-auto bg-content p-6 relative">
           {children}
         </main>
       </div>
-    </>
+    </div>
   );
 }
 

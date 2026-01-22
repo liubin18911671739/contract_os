@@ -22,7 +22,7 @@ export function Header({
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   return (
-    <header className="bg-content border-b border-gray-200 px-6 py-3">
+    <header className="bg-content border-b border-gray-200 px-6 py-3 relative z-40">
       <div className="flex items-center justify-between">
         {/* Search Bar */}
         <div className="flex-1 max-w-xl mx-8">
@@ -56,7 +56,7 @@ export function Header({
             </button>
 
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 p-4 z-50">
+              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border border-gray-200 p-4 z-50">
                 <h3 className="font-semibold text-gray-900 mb-2">通知</h3>
                 <div className="space-y-2">
                   <div className="text-sm text-gray-600">
@@ -84,7 +84,7 @@ export function Header({
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
                 <a
                   href="#profile"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
